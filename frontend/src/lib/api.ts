@@ -5,6 +5,21 @@ export type HealthResponse = {
   error?: string
 }
 
+export type AuthUser = {
+  email: string
+}
+
+export type LoginResponse = {
+  token: string
+  user: AuthUser
+}
+
+export type MeResponse = {
+  user: AuthUser
+}
+
+const AUTH_STORAGE_KEY = 'reservation_system_auth'
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
   timeout: 5000,
@@ -14,7 +29,7 @@ const apiClient = axios.create({
 })
 
 apiClient.interceptors.request.use((config) => {
-  const storedValue = window.localStorage.getItem('reservation_system_auth')
+  const storedValue = window.localStorage.getItem(AUTH_STORAGE_KEY)
 
   if (!storedValue) {
     return config
@@ -26,7 +41,7 @@ apiClient.interceptors.request.use((config) => {
       config.headers.Authorization = `Bearer ${parsed.token}`
     }
   } catch {
-    window.localStorage.removeItem('reservation_system_auth')
+    window.localStorage.removeItem(AUTH_STORAGE_KEY)
   }
 
   return config
@@ -53,4 +68,22 @@ export async function fetchHealth() {
   return response.data
 }
 
-export { apiClient }
+export async function loginRequest(email: string, password: string) {
+  const response = await apiClient.post<LoginResponse>('/auth/login', {
+    email,
+    password,
+  })
+
+  return response.data
+}
+
+export async function fetchCurrentUser() {
+  const response = await apiClient.get<MeResponse>('/auth/me')
+  return response.data
+}
+
+export async function logoutRequest() {
+  await apiClient.delete('/auth/logout')
+}
+
+export { apiClient, AUTH_STORAGE_KEY }

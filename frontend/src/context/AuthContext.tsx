@@ -6,10 +6,13 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-
-type AuthUser = {
-  email: string
-}
+import {
+  AUTH_STORAGE_KEY,
+  fetchCurrentUser,
+  loginRequest,
+  logoutRequest,
+  type AuthUser,
+} from '../lib/api'
 
 type AuthState = {
   isAuthenticated: boolean
@@ -22,10 +25,7 @@ type AuthState = {
 
 type StoredAuth = {
   token: string
-  user: AuthUser
 }
-
-const STORAGE_KEY = 'reservation_system_auth'
 
 const AuthContext = createContext<AuthState | null>(null)
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(STORAGE_KEY)
+    const storedValue = window.localStorage.getItem(AUTH_STORAGE_KEY)
 
     if (!storedValue) {
       setIsLoading(false)
@@ -45,31 +45,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const parsed = JSON.parse(storedValue) as StoredAuth
       setToken(parsed.token)
-      setUser(parsed.user)
     } catch {
-      window.localStorage.removeItem(STORAGE_KEY)
-    } finally {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY)
       setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (!token) {
+      setUser(null)
+      return
+    }
+
+    let active = true
+
+    async function syncSession() {
+      try {
+        const response = await fetchCurrentUser()
+        if (!active) {
+          return
+        }
+
+        setUser(response.user)
+      } catch {
+        if (!active) {
+          return
+        }
+
+        window.localStorage.removeItem(AUTH_STORAGE_KEY)
+        setToken(null)
+        setUser(null)
+      } finally {
+        if (active) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void syncSession()
+
+    return () => {
+      active = false
+    }
+  }, [token])
 
   async function login(email: string, password: string) {
     if (!email || !password) {
       throw new Error('メールアドレスとパスワードを入力してください。')
     }
 
+    const response = await loginRequest(email, password)
     const nextAuth: StoredAuth = {
-      token: `demo-token-${Date.now()}`,
-      user: { email },
+      token: response.token,
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAuth))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextAuth))
     setToken(nextAuth.token)
-    setUser(nextAuth.user)
+    setUser(response.user)
   }
 
   function logout() {
-    window.localStorage.removeItem(STORAGE_KEY)
+    void logoutRequest()
+    window.localStorage.removeItem(AUTH_STORAGE_KEY)
     setToken(null)
     setUser(null)
   }

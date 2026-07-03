@@ -24,7 +24,9 @@ function App() {
             Home
           </NavLink>
           <NavLink
-            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            className={({ isActive }) =>
+              isAuthenticated && isActive ? 'nav-link active' : 'nav-link'
+            }
             to="/reservations"
           >
             Reservations

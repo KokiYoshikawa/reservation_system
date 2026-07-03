@@ -20,7 +20,13 @@ func main() {
 	}
 	defer db.Close()
 
-	repo := repository.New(db)
+	redisClient, err := database.NewRedis(cfg)
+	if err != nil {
+		log.Fatalf("failed to connect to redis: %v", err)
+	}
+	defer redisClient.Close()
+
+	repo := repository.New(db, redisClient, cfg.SessionTTL)
 	h := handler.New(repo)
 	router, err := internalrouter.New(h)
 	if err != nil {

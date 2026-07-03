@@ -16,6 +16,10 @@ func New(h *handler.Handler) (*gin.Engine, error) {
 
 	api := router.Group("/api/v1")
 	api.GET("/health", h.Health)
+	auth := api.Group("/auth")
+	auth.POST("/login", h.Login)
+	auth.GET("/me", h.Me)
+	auth.DELETE("/logout", h.Logout)
 
 	return router, nil
 }
