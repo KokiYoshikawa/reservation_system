@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '../components/ErrorMessage'
+import { LoadingIndicator } from '../components/LoadingIndicator'
 import { useAuth } from '../context/AuthContext'
 
 export function HomePage() {
@@ -65,9 +66,17 @@ export function HomePage() {
             </label>
 
             <button type="submit" className="login-button" disabled={isSubmitting}>
-              {isSubmitting ? 'ログイン中...' : 'ログイン'}
+              {isSubmitting ? 'ログイン中' : 'ログイン'}
             </button>
           </form>
+
+          {isSubmitting ? (
+            <LoadingIndicator
+              label="認証情報を確認しています..."
+              className="login-feedback"
+              compact
+            />
+          ) : null}
 
           {error ? (
             <ErrorMessage

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ErrorMessage } from '../components/ErrorMessage'
+import { LoadingIndicator } from '../components/LoadingIndicator'
 import { fetchHealth, type HealthResponse } from '../lib/api'
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error'
@@ -53,7 +54,7 @@ export function HealthPage() {
       <div className="status-card">
         <p className="status-label">API status</p>
         {state === 'loading' || state === 'idle' ? (
-          <p className="status-value">Loading...</p>
+          <LoadingIndicator label="API 状態を確認しています..." className="status-feedback" />
         ) : null}
         {state === 'success' && health ? (
           <p className="status-value success">{health.status}</p>
