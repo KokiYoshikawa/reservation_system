@@ -1,11 +1,14 @@
 import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
+import { useAuth } from './context/AuthContext'
 import { HealthPage } from './pages/HealthPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ReservationsPage } from './pages/ReservationsPage'
 
 function App() {
+  const { isAuthenticated, isLoading, logout, user } = useAuth()
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -33,6 +36,20 @@ function App() {
             Health
           </NavLink>
         </nav>
+        <div className="auth-panel">
+          {isLoading ? <span className="auth-meta">認証状態を確認中...</span> : null}
+          {!isLoading && isAuthenticated && user ? (
+            <>
+              <span className="auth-meta">{user.email}</span>
+              <button type="button" className="auth-button" onClick={logout}>
+                ログアウト
+              </button>
+            </>
+          ) : null}
+          {!isLoading && !isAuthenticated ? (
+            <span className="auth-meta">未ログイン</span>
+          ) : null}
+        </div>
       </header>
 
       <main className="content">

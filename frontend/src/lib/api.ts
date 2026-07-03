@@ -13,6 +13,25 @@ const apiClient = axios.create({
   },
 })
 
+apiClient.interceptors.request.use((config) => {
+  const storedValue = window.localStorage.getItem('reservation_system_auth')
+
+  if (!storedValue) {
+    return config
+  }
+
+  try {
+    const parsed = JSON.parse(storedValue) as { token?: string }
+    if (parsed.token) {
+      config.headers.Authorization = `Bearer ${parsed.token}`
+    }
+  } catch {
+    window.localStorage.removeItem('reservation_system_auth')
+  }
+
+  return config
+})
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

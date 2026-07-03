@@ -1,4 +1,30 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+
 export function HomePage() {
+  const navigate = useNavigate()
+  const { isAuthenticated, login, user } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      await login(email, password)
+      navigate('/reservations')
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'ログインに失敗しました。')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <section className="login-stage">
       <div className="login-window">
@@ -12,25 +38,40 @@ export function HomePage() {
           <p className="login-title">予約管理システム</p>
           <h1 className="login-heading">ログイン</h1>
 
-          <form className="login-form">
+          <form className="login-form" onSubmit={handleSubmit}>
             <label className="input-row">
               <span className="input-icon" aria-hidden="true">
                 ✉
               </span>
-              <input type="email" placeholder="メールアドレス" />
+              <input
+                type="email"
+                placeholder="メールアドレス"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
             </label>
 
             <label className="input-row">
               <span className="input-icon" aria-hidden="true">
                 🔒
               </span>
-              <input type="password" placeholder="パスワード" />
+              <input
+                type="password"
+                placeholder="パスワード"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
             </label>
 
-            <button type="button" className="login-button">
-              ログイン
+            <button type="submit" className="login-button" disabled={isSubmitting}>
+              {isSubmitting ? 'ログイン中...' : 'ログイン'}
             </button>
           </form>
+
+          {error ? <p className="login-message error">{error}</p> : null}
+          {isAuthenticated && user ? (
+            <p className="login-message success">{user.email} でログイン中です。</p>
+          ) : null}
 
           <a className="forgot-link" href="#">
             パスワードを忘れた方はこちら

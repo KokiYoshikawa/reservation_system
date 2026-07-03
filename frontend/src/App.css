@@ -33,6 +33,37 @@
   gap: 12px;
 }
 
+.auth-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+
+  @media (max-width: 720px) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.auth-meta {
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.auth-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-h);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .nav-link {
   color: var(--text);
   text-decoration: none;
@@ -191,6 +222,27 @@
 .login-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(37, 87, 199, 0.28);
+}
+
+.login-button:disabled {
+  cursor: wait;
+  opacity: 0.82;
+  transform: none;
+  box-shadow: 0 8px 18px rgba(37, 87, 199, 0.16);
+}
+
+.login-message {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-message.success {
+  color: #2f7d32;
+}
+
+.login-message.error {
+  color: #b33a2b;
 }
 
 .forgot-link {
