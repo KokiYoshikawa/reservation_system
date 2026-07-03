@@ -23,6 +23,14 @@ func (h *Handler) Root(c *gin.Context) {
 }
 
 func (h *Handler) Health(c *gin.Context) {
+	if err := h.repo.CheckHealth(c.Request.Context()); err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"status": "database unavailable",
+			"error":  err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": h.repo.GetHealthStatus(),
 	})

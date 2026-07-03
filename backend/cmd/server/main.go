@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
-	"os"
 
+	"reservation-system/backend/internal/config"
+	"reservation-system/backend/internal/database"
 	"reservation-system/backend/internal/handler"
 	"reservation-system/backend/internal/repository"
 
@@ -11,25 +12,25 @@ import (
 )
 
 func main() {
-	repo := repository.New()
+	cfg := config.Load()
+
+	db, err := database.NewPostgres(cfg)
+	if err != nil {
+		log.Fatalf("failed to connect to postgres: %v", err)
+	}
+	defer db.Close()
+
+	repo := repository.New(db)
 	h := handler.New(repo)
 	router, err := internalrouter.New(h)
 	if err != nil {
 		log.Fatalf("failed to configure trusted proxies: %v", err)
 	}
 
-	addr := ":" + getEnv("PORT", "8080")
+	addr := ":" + cfg.Port
 	log.Printf("starting gin server on %s", addr)
 
 	if err := router.Run(addr); err != nil {
 		log.Fatalf("failed to start gin server: %v", err)
 	}
-}
-
-func getEnv(key, fallback string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-
-	return fallback
 }
