@@ -1,0 +1,6 @@
+DROP INDEX IF EXISTS idx_users_role;
+
+ALTER TABLE IF EXISTS users
+    DROP CONSTRAINT IF EXISTS uk_users_email;
+
+DROP TABLE IF EXISTS users;
