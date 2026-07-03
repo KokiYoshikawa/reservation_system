@@ -40,7 +40,7 @@ logs:
 # -----------------------------
 
 psql:
-	docker compose exec postgres psql -U postgres reservation
+	docker compose exec postgres psql -U postgres reservation_system
 
 # -----------------------------
 # Migration
@@ -48,11 +48,11 @@ psql:
 
 migrate-up:
 	migrate -path backend/migrations \
-	-database "postgres://postgres:password@localhost:5432/reservation?sslmode=disable" up
+	-database "postgres://postgres:postgres@localhost:5432/reservation_system?sslmode=disable" up
 
 migrate-down:
 	migrate -path backend/migrations \
-	-database "postgres://postgres:password@localhost:5432/reservation?sslmode=disable" down
+	-database "postgres://postgres:postgres@localhost:5432/reservation_system?sslmode=disable" down
 
 migrate-create:
 	migrate create -ext sql -dir backend/migrations -seq $(name)
