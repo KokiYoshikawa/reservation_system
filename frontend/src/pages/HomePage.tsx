@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ErrorMessage } from '../components/ErrorMessage'
 import { useAuth } from '../context/AuthContext'
 
 export function HomePage() {
@@ -68,7 +69,13 @@ export function HomePage() {
             </button>
           </form>
 
-          {error ? <p className="login-message error">{error}</p> : null}
+          {error ? (
+            <ErrorMessage
+              message={error}
+              title="ログインに失敗しました"
+              className="login-feedback"
+            />
+          ) : null}
           {isAuthenticated && user ? (
             <p className="login-message success">{user.email} でログイン中です。</p>
           ) : null}

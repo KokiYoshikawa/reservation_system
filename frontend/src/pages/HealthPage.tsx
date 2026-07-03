@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ErrorMessage } from '../components/ErrorMessage'
 import { fetchHealth, type HealthResponse } from '../lib/api'
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error'
@@ -57,7 +58,13 @@ export function HealthPage() {
         {state === 'success' && health ? (
           <p className="status-value success">{health.status}</p>
         ) : null}
-        {state === 'error' ? <p className="status-value error">{error}</p> : null}
+        {state === 'error' ? (
+          <ErrorMessage
+            message={error}
+            title="ヘルスチェックに失敗しました"
+            className="status-feedback"
+          />
+        ) : null}
       </div>
     </section>
   )
