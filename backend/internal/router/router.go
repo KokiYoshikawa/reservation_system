@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(h *handler.Handler) (*gin.Engine, error) {
+func New(h *handler.Handler, userHandler *handler.UserHandler) (*gin.Engine, error) {
 	router := gin.Default()
 	if err := router.SetTrustedProxies(nil); err != nil {
 		return nil, err
@@ -17,6 +17,7 @@ func New(h *handler.Handler) (*gin.Engine, error) {
 	api := router.Group("/api/v1")
 	api.GET("/health", h.Health)
 	auth := api.Group("/auth")
+	auth.POST("/register", userHandler.CreateUser)
 	auth.POST("/login", h.Login)
 	auth.GET("/me", h.Me)
 	auth.DELETE("/logout", h.Logout)

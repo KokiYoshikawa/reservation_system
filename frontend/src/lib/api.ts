@@ -18,6 +18,13 @@ export type MeResponse = {
   user: AuthUser
 }
 
+export type CreateUserApiRequest = {
+  name: string
+  email: string
+  password_hash: string
+  role: string
+}
+
 const AUTH_STORAGE_KEY = 'reservation_system_auth'
 
 const apiClient = axios.create({
@@ -84,6 +91,11 @@ export async function fetchCurrentUser() {
 
 export async function logoutRequest() {
   await apiClient.delete('/auth/logout')
+}
+
+export async function createUserRequest(payload: CreateUserApiRequest) {
+  const response = await apiClient.post('/auth/register', payload)
+  return response.data
 }
 
 export { apiClient, AUTH_STORAGE_KEY }

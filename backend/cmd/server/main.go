@@ -7,6 +7,7 @@ import (
 	"reservation-system/backend/internal/database"
 	"reservation-system/backend/internal/handler"
 	"reservation-system/backend/internal/repository"
+	"reservation-system/backend/internal/service"
 
 	internalrouter "reservation-system/backend/internal/router"
 )
@@ -28,7 +29,9 @@ func main() {
 
 	repo := repository.New(db, redisClient, cfg.SessionTTL)
 	h := handler.New(repo)
-	router, err := internalrouter.New(h)
+	userService := service.NewUserService(repo)
+	userHandler := handler.NewUserHandler(userService)
+	router, err := internalrouter.New(h, userHandler)
 	if err != nil {
 		log.Fatalf("failed to configure trusted proxies: %v", err)
 	}
