@@ -1,27 +1,42 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { LoadingIndicator } from '../components/LoadingIndicator'
-import { useAuth } from '../context/AuthContext'
+import { createUserRequest } from '../lib/api'
 
-export function HomePage() {
-  const navigate = useNavigate()
-  const { isAuthenticated, login, user } = useAuth()
+export function RegisterPage() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('user')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
+    setSuccess('')
     setIsSubmitting(true)
 
     try {
-      await login(email, password)
-      navigate('/reservations')
-    } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'ログインに失敗しました。')
+      await createUserRequest({
+        name,
+        email,
+        password_hash: password,
+        role,
+      })
+      setSuccess('ユーザーを登録しました。ログイン画面から認証できます。')
+      setName('')
+      setEmail('')
+      setPassword('')
+      setRole('user')
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'ユーザー登録に失敗しました。',
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -29,7 +44,7 @@ export function HomePage() {
 
   return (
     <section className="auth-stage">
-      <div className="auth-window">
+      <div className="auth-window register-window">
         <div className="window-dots" aria-hidden="true">
           <span className="dot red"></span>
           <span className="dot yellow"></span>
@@ -38,9 +53,21 @@ export function HomePage() {
 
         <div className="login-card">
           <p className="login-title">予約管理システム</p>
-          <h1 className="login-heading">ログイン</h1>
+          <h1 className="login-heading">ユーザー登録</h1>
 
           <form className="login-form" onSubmit={handleSubmit}>
+            <label className="input-row">
+              <span className="input-icon" aria-hidden="true">
+                👤
+              </span>
+              <input
+                type="text"
+                placeholder="氏名"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </label>
+
             <label className="input-row">
               <span className="input-icon" aria-hidden="true">
                 ✉
@@ -65,14 +92,24 @@ export function HomePage() {
               />
             </label>
 
+            <label className="select-row">
+              <span className="input-icon" aria-hidden="true">
+                ⚙
+              </span>
+              <select value={role} onChange={(event) => setRole(event.target.value)}>
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+            </label>
+
             <button type="submit" className="login-button" disabled={isSubmitting}>
-              {isSubmitting ? 'ログイン中' : 'ログイン'}
+              {isSubmitting ? '登録中' : '登録する'}
             </button>
           </form>
 
           {isSubmitting ? (
             <LoadingIndicator
-              label="認証情報を確認しています..."
+              label="ユーザー情報を登録しています..."
               className="login-feedback"
               compact
             />
@@ -81,20 +118,16 @@ export function HomePage() {
           {error ? (
             <ErrorMessage
               message={error}
-              title="ログインに失敗しました"
+              title="ユーザー登録に失敗しました"
               className="login-feedback"
             />
           ) : null}
-          {isAuthenticated && user ? (
-            <p className="login-message success">{user.email} でログイン中です。</p>
-          ) : null}
+
+          {success ? <p className="login-message success">{success}</p> : null}
 
           <div className="auth-links">
-            <a className="forgot-link" href="#">
-              パスワードを忘れた方はこちら
-            </a>
-            <Link className="forgot-link secondary-link" to="/register">
-              新規ユーザー登録はこちら
+            <Link className="forgot-link" to="/">
+              ログイン画面へ戻る
             </Link>
           </div>
         </div>

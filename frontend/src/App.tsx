@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'
 import { HealthPage } from './pages/HealthPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { RegisterPage } from './pages/RegisterPage'
 import { ReservationsPage } from './pages/ReservationsPage'
 
 function App() {
@@ -37,6 +38,12 @@ function App() {
           >
             Health
           </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            to="/register"
+          >
+            Register
+          </NavLink>
         </nav>
         <div className="auth-panel">
           {isLoading ? <span className="auth-meta">認証状態を確認中...</span> : null}
@@ -57,6 +64,7 @@ function App() {
       <main className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/reservations" element={<ReservationsPage />} />
           <Route path="/health" element={<HealthPage />} />
           <Route path="*" element={<NotFoundPage />} />

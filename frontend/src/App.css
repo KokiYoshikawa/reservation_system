@@ -108,18 +108,22 @@
   }
 }
 
-.login-stage {
+.auth-stage {
   width: 100%;
   display: grid;
   place-items: center;
 }
 
-.login-window {
+.auth-window {
   width: min(100%, 355px);
   border: 1px solid #d8dee9;
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 16px 40px rgba(34, 65, 128, 0.08);
+}
+
+.register-window {
+  width: min(100%, 420px);
 }
 
 .window-dots {
@@ -183,6 +187,17 @@
   background: #fff;
 }
 
+.select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d8dfec;
+  border-radius: 4px;
+  background: #fff;
+}
+
 .input-icon {
   color: #6b7a99;
   font-size: 14px;
@@ -201,6 +216,16 @@
 
 .input-row input::placeholder {
   color: #9aa6bd;
+}
+
+.select-row select {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #334155;
+  font-size: 14px;
+  font-family: var(--sans);
 }
 
 .login-button {
@@ -252,7 +277,6 @@
 
 .forgot-link {
   display: inline-block;
-  margin-top: 16px;
   color: #2a60c9;
   font-size: 13px;
   font-weight: 600;
@@ -261,6 +285,16 @@
 
 .forgot-link:hover {
   text-decoration: underline;
+}
+
+.auth-links {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.secondary-link {
+  color: #48638f;
 }
 
 .status-card {
