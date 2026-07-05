@@ -53,6 +53,9 @@
 }
 
 .auth-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 36px;
   padding: 0 14px;
   border: 1px solid var(--border);
@@ -62,6 +65,17 @@
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.auth-link {
+  text-decoration: none;
+}
+
+.auth-link.active,
+.auth-link:hover {
+  color: var(--text-h);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }
 
 .nav-link {
@@ -420,4 +434,93 @@
   color: var(--text-h);
   background: transparent;
   border: 1px solid var(--border);
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #6f7f9d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page h1 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: clamp(2rem, 4vw, 2.7rem);
+}
+
+.lead {
+  margin-top: 18px;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.profile-card {
+  margin-top: 28px;
+  padding: 26px;
+  border: 1px solid #d8dfec;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(47, 111, 228, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 249, 255, 0.92));
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+  }
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #eaf3ff;
+  color: #2357c7;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.profile-grid {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 0;
+}
+
+.profile-row {
+  display: grid;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(111, 127, 157, 0.18);
+}
+
+.profile-row dt {
+  color: #6f7f9d;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.profile-row dd {
+  margin: 0;
+  color: #1d2b53;
+  font-size: 1rem;
+  font-weight: 700;
 }

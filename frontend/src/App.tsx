@@ -3,6 +3,8 @@ import './App.css'
 import { useAuth } from './context/AuthContext'
 import { HealthPage } from './pages/HealthPage'
 import { HomePage } from './pages/HomePage'
+import { LoginPage } from './pages/LoginPage'
+import { MyPage } from './pages/MyPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ReservationsPage } from './pages/ReservationsPage'
@@ -19,10 +21,9 @@ function App() {
         <nav className="site-nav" aria-label="global">
           <NavLink
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-            to="/"
-            end
+            to="/login"
           >
-            Home
+            Login
           </NavLink>
           <NavLink
             className={({ isActive }) =>
@@ -49,6 +50,14 @@ function App() {
           {isLoading ? <span className="auth-meta">認証状態を確認中...</span> : null}
           {!isLoading && isAuthenticated && user ? (
             <>
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'auth-button auth-link active' : 'auth-button auth-link'
+                }
+                to="/mypage"
+              >
+                マイページ
+              </NavLink>
               <span className="auth-meta">{user.email}</span>
               <button type="button" className="auth-button" onClick={logout}>
                 ログアウト
@@ -64,6 +73,8 @@ function App() {
       <main className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/mypage" element={<MyPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/reservations" element={<ReservationsPage />} />
           <Route path="/health" element={<HealthPage />} />

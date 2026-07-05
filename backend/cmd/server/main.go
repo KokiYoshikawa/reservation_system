@@ -29,9 +29,11 @@ func main() {
 
 	repo := repository.New(db, redisClient, cfg.SessionTTL)
 	h := handler.New(repo)
+	authService := service.NewAuthService(repo)
+	authHandler := handler.NewAuthHandler(authService)
 	userService := service.NewUserService(repo)
 	userHandler := handler.NewUserHandler(userService)
-	router, err := internalrouter.New(h, userHandler)
+	router, err := internalrouter.New(h, authHandler, userHandler)
 	if err != nil {
 		log.Fatalf("failed to configure trusted proxies: %v", err)
 	}

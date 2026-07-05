@@ -7,6 +7,9 @@ export type HealthResponse = {
 
 export type AuthUser = {
   email: string
+  id?: number
+  name?: string
+  role?: string
 }
 
 export type LoginResponse = {
@@ -90,7 +93,7 @@ export async function fetchCurrentUser() {
 }
 
 export async function logoutRequest() {
-  await apiClient.delete('/auth/logout')
+  await apiClient.post('/auth/logout')
 }
 
 export async function createUserRequest(payload: CreateUserApiRequest) {
