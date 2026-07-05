@@ -71,6 +71,23 @@ func (r *Repository) DeleteSession(ctx context.Context, token string) error {
 	return r.redis.Del(ctx, r.sessionKey(token)).Err()
 }
 
+func (r *Repository) RevokeToken(ctx context.Context, token string, ttl time.Duration) error {
+	return r.redis.Set(ctx, r.revokedTokenKey(token), "1", ttl).Err()
+}
+
+func (r *Repository) IsTokenRevoked(ctx context.Context, token string) (bool, error) {
+	_, err := r.redis.Get(ctx, r.revokedTokenKey(token)).Result()
+	if err == nil {
+		return true, nil
+	}
+
+	if err == redis.Nil {
+		return false, nil
+	}
+
+	return false, err
+}
+
 func ExtractBearerToken(headerValue string) string {
 	if headerValue == "" {
 		return ""
@@ -86,4 +103,8 @@ func ExtractBearerToken(headerValue string) string {
 
 func (r *Repository) sessionKey(token string) string {
 	return "auth:session:" + token
+}
+
+func (r *Repository) revokedTokenKey(token string) string {
+	return "auth:revoked:" + token
 }

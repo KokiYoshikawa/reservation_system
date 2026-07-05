@@ -59,6 +59,8 @@ services:
       REDIS_PORT: 6379
       REDIS_DB: 0
       SESSION_TTL: 24h
+      JWT_SECRET: reservation-system-secret
+      JWT_ISSUER: reservation-system
     ports:
       - "8080:8080"
     depends_on:

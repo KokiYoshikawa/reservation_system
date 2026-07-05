@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"reservation-system/backend/internal/repository"
+	"reservation-system/backend/internal/middleware"
 	"reservation-system/backend/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -66,23 +66,24 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-	token := extractBearerToken(c.GetHeader("Authorization"))
-	if token == "" {
+	claims, ok := c.Get(middleware.AuthClaimsContextKey)
+	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "missing authorization token",
+			"error": "authentication context not found",
 		})
 		return
 	}
 
-	user, err := h.authService.Me(c.Request.Context(), token)
-	if err != nil {
-		if errors.Is(err, service.ErrSessionNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "session not found",
-			})
-			return
-		}
+	authClaims, ok := claims.(*service.AuthClaims)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid authentication context",
+		})
+		return
+	}
 
+	user, err := h.authService.Me(c.Request.Context(), authClaims.Email)
+	if err != nil {
 		if errors.Is(err, service.ErrUserNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "user not found",
@@ -107,17 +108,32 @@ func (h *AuthHandler) Me(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	token := extractBearerToken(c.GetHeader("Authorization"))
-	if token == "" {
+	authToken, ok := c.Get("authToken")
+	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "missing authorization token",
+			"error": "authentication token not found",
+		})
+		return
+	}
+
+	token, ok := authToken.(string)
+	if !ok || token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid authentication token",
 		})
 		return
 	}
 
 	if err := h.authService.Logout(c.Request.Context(), token); err != nil {
+		if errors.Is(err, service.ErrInvalidToken) || errors.Is(err, service.ErrTokenRevoked) {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid token",
+			})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to delete session",
+			"error": "failed to logout",
 		})
 		return
 	}
@@ -125,8 +141,4 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "logged out",
 	})
-}
-
-func extractBearerToken(headerValue string) string {
-	return repository.ExtractBearerToken(headerValue)
 }

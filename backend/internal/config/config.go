@@ -19,6 +19,8 @@ type Config struct {
 	RedisPassword string
 	RedisDB       int
 	SessionTTL    time.Duration
+	JWTSecret     string
+	JWTIssuer     string
 }
 
 func Load() Config {
@@ -35,6 +37,8 @@ func Load() Config {
 		RedisPassword: os.Getenv("REDIS_PASSWORD"),
 		RedisDB:       getEnvAsInt("REDIS_DB", 0),
 		SessionTTL:    getEnvAsDuration("SESSION_TTL", 24*time.Hour),
+		JWTSecret:     getEnv("JWT_SECRET", "reservation-system-secret"),
+		JWTIssuer:     getEnv("JWT_ISSUER", "reservation-system"),
 	}
 }
 
