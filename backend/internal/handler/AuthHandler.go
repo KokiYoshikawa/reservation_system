@@ -5,14 +5,13 @@ import (
 	"net/http"
 
 	"reservation-system/backend/internal/repository"
+	"reservation-system/backend/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
-	"github.com/redis/go-redis/v9"
 )
 
 type AuthHandler struct {
-	repo *repository.Repository
+	authService service.AuthService
 }
 
 type loginRequest struct {
@@ -20,8 +19,8 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
-func NewAuthHandler(repo *repository.Repository) *AuthHandler {
-	return &AuthHandler{repo: repo}
+func NewAuthHandler(authService service.AuthService) *AuthHandler {
+	return &AuthHandler{authService: authService}
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
@@ -40,10 +39,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.repo.CreateSession(c.Request.Context(), req.Email)
+	token, user, err := h.authService.Login(c.Request.Context(), req.Email)
 	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "user not found",
+			})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to create session",
+			"error": "failed to login",
 		})
 		return
 	}
@@ -51,13 +57,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
 		"user": gin.H{
-			"email": req.Email,
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+			"role":  user.Role,
 		},
 	})
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-	token := repository.ExtractBearerToken(c.GetHeader("Authorization"))
+	token := extractBearerToken(c.GetHeader("Authorization"))
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "missing authorization token",
@@ -65,24 +74,16 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 
-	email, err := h.repo.GetSessionEmail(c.Request.Context(), token)
+	user, err := h.authService.Me(c.Request.Context(), token)
 	if err != nil {
-		if errors.Is(err, redis.Nil) {
+		if errors.Is(err, service.ErrSessionNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "session not found",
 			})
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to read session",
-		})
-		return
-	}
-
-	user, err := h.repo.GetUserByEmail(c.Request.Context(), email)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, service.ErrUserNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "user not found",
 			})
@@ -106,7 +107,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	token := repository.ExtractBearerToken(c.GetHeader("Authorization"))
+	token := extractBearerToken(c.GetHeader("Authorization"))
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "missing authorization token",
@@ -114,7 +115,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	if err := h.repo.DeleteSession(c.Request.Context(), token); err != nil {
+	if err := h.authService.Logout(c.Request.Context(), token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "failed to delete session",
 		})
@@ -124,4 +125,8 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "logged out",
 	})
+}
+
+func extractBearerToken(headerValue string) string {
+	return repository.ExtractBearerToken(headerValue)
 }
