@@ -1,5 +1,6 @@
 import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
+import { ProtectedRoute } from './components/ProtectedRoute'
 import { useAuth } from './context/AuthContext'
 import { HealthPage } from './pages/HealthPage'
 import { HomePage } from './pages/HomePage'
@@ -74,9 +75,23 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/mypage" element={<MyPage />} />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/reservations" element={<ReservationsPage />} />
+          <Route
+            path="/reservations"
+            element={
+              <ProtectedRoute>
+                <ReservationsPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/health" element={<HealthPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
