@@ -19,7 +19,7 @@ export function LoginPage() {
 
     try {
       await login(email, password)
-      navigate('/reservations')
+      navigate('/mypage')
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'ログインに失敗しました。')
     } finally {
@@ -39,7 +39,6 @@ export function LoginPage() {
         <div className="login-card">
           <p className="login-title">予約管理システム</p>
           <h1 className="login-heading">ログイン</h1>
-          <p className="login-caption">POST /api/v1/auth/login</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <label className="input-row">

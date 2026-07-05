@@ -7,6 +7,9 @@ export type HealthResponse = {
 
 export type AuthUser = {
   email: string
+  id?: number
+  name?: string
+  role?: string
 }
 
 export type LoginResponse = {

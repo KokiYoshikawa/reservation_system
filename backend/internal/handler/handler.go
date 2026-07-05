@@ -7,6 +7,7 @@ import (
 	"reservation-system/backend/internal/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -107,9 +108,27 @@ func (h *Handler) Me(c *gin.Context) {
 		return
 	}
 
+	user, err := h.repo.GetUserByEmail(c.Request.Context(), email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "user not found",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to load user",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"user": gin.H{
-			"email": email,
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+			"role":  user.Role,
 		},
 	})
 }

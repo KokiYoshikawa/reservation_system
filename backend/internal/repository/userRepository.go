@@ -50,3 +50,33 @@ func (r *Repository) CreateUser(ctx context.Context, user *domain.User) (*domain
 
 	return createdUser, nil
 }
+
+func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	const query = `
+		SELECT
+			id,
+			name,
+			email,
+			password_hash,
+			role,
+			created_at,
+			updated_at
+		FROM users
+		WHERE email = $1
+	`
+
+	user := &domain.User{}
+	if err := r.db.QueryRow(ctx, query, email).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.PasswordHash,
+		&user.Role,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	); err != nil {
+		return nil, fmt.Errorf("get user by email: %w", err)
+	}
+
+	return user, nil
+}
