@@ -40,7 +40,10 @@ services:
     command:
       - /bin/sh
       - -c
-      - psql -h postgres -U postgres -d reservation_system -f /migrations/000001_create_users_table.up.sql
+      - |
+        for file in /migrations/*.up.sql; do
+          psql -h postgres -U postgres -d reservation_system -f "$$file";
+        done
     restart: "no"
 
   backend:

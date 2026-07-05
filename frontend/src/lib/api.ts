@@ -5,6 +5,20 @@ export type HealthResponse = {
   error?: string
 }
 
+export type ServiceItem = {
+  id: number
+  name: string
+  duration_minutes: number
+  price: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ServicesResponse = {
+  services: ServiceItem[]
+}
+
 export type AuthUser = {
   email: string
   id?: number
@@ -75,6 +89,11 @@ apiClient.interceptors.response.use(
 
 export async function fetchHealth() {
   const response = await apiClient.get<HealthResponse>('/health')
+  return response.data
+}
+
+export async function fetchServices() {
+  const response = await apiClient.get<ServicesResponse>('/services')
   return response.data
 }
 
