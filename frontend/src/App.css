@@ -171,6 +171,13 @@
   letter-spacing: 0;
 }
 
+.login-caption {
+  margin: -8px 0 18px;
+  color: #6f7f9d;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
 .login-form {
   display: grid;
   gap: 10px;

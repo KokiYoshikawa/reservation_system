@@ -3,6 +3,7 @@ import './App.css'
 import { useAuth } from './context/AuthContext'
 import { HealthPage } from './pages/HealthPage'
 import { HomePage } from './pages/HomePage'
+import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ReservationsPage } from './pages/ReservationsPage'
@@ -19,10 +20,9 @@ function App() {
         <nav className="site-nav" aria-label="global">
           <NavLink
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-            to="/"
-            end
+            to="/login"
           >
-            Home
+            Login
           </NavLink>
           <NavLink
             className={({ isActive }) =>
@@ -64,6 +64,7 @@ function App() {
       <main className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/reservations" element={<ReservationsPage />} />
           <Route path="/health" element={<HealthPage />} />
