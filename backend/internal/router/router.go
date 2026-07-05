@@ -21,7 +21,6 @@ func New(h *handler.Handler, authHandler *handler.AuthHandler, userHandler *hand
 	auth.POST("/login", authHandler.Login)
 	auth.POST("/logout", authHandler.Logout)
 	auth.GET("/me", authHandler.Me)
-	auth.DELETE("/logout", authHandler.Logout)
 
 	return router, nil
 }
