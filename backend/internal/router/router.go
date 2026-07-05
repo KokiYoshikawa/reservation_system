@@ -19,6 +19,7 @@ func New(h *handler.Handler, userHandler *handler.UserHandler) (*gin.Engine, err
 	auth := api.Group("/auth")
 	auth.POST("/register", userHandler.CreateUser)
 	auth.POST("/login", h.Login)
+	auth.POST("/logout", h.Logout)
 	auth.GET("/me", h.Me)
 	auth.DELETE("/logout", h.Logout)
 
