@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { LoadingIndicator } from '../components/LoadingIndicator'
 import { fetchServices, type ServiceItem } from '../lib/api'
@@ -84,6 +85,14 @@ export function ServiceListPage() {
                     <dd>{service.price.toLocaleString('ja-JP')}円</dd>
                   </div>
                 </dl>
+                <div className="slot-card-actions">
+                  <Link
+                    className="button primary slot-select-button"
+                    to={`/reservation-slots?serviceId=${service.id}`}
+                  >
+                    このサービスで空き枠を探す
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

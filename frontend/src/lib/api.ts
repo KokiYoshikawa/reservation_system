@@ -19,6 +19,22 @@ export type ServicesResponse = {
   services: ServiceItem[]
 }
 
+export type ReservationSlotItem = {
+  slotId: number
+  startTime: string
+  endTime: string
+  capacity: number
+  reservedCount: number
+  available: boolean
+}
+
+export type ReservationSlotsResponse = {
+  data: {
+    date: string
+    slots: ReservationSlotItem[]
+  }
+}
+
 export type AuthUser = {
   email: string
   id?: number
@@ -94,6 +110,16 @@ export async function fetchHealth() {
 
 export async function fetchServices() {
   const response = await apiClient.get<ServicesResponse>('/services')
+  return response.data
+}
+
+export async function fetchReservationSlots(date: string, serviceId: number) {
+  const response = await apiClient.get<ReservationSlotsResponse>('/reservation-slots', {
+    params: {
+      date,
+      serviceId,
+    },
+  })
   return response.data
 }
 

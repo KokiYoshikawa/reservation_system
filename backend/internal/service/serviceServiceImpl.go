@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"reservation-system/backend/internal/domain"
 	"reservation-system/backend/internal/repository"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type serviceService struct {
@@ -19,6 +22,10 @@ func NewServiceService(repo *repository.Repository) ServiceService {
 func (s *serviceService) FindServiceByID(ctx context.Context, serviceID int64) (*domain.Service, error) {
 	service, err := s.repo.FindServiceByID(ctx, serviceID)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrServiceNotFound
+		}
+
 		return nil, fmt.Errorf("service find service by id: %w", err)
 	}
 
