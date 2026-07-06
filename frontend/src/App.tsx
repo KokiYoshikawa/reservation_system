@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage'
 import { MyPage } from './pages/MyPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { ReservationSlotSearchPage } from './pages/ReservationSlotSearchPage'
 import { ReservationsPage } from './pages/ReservationsPage'
 import { ServiceListPage } from './pages/ServiceListPage'
 
@@ -34,6 +35,12 @@ function App() {
             to="/reservations"
           >
             Reservations
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            to="/reservation-slots"
+          >
+            Slots
           </NavLink>
           <NavLink
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
@@ -82,6 +89,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reservation-slots" element={<ReservationSlotSearchPage />} />
           <Route path="/services" element={<ServiceListPage />} />
           <Route
             path="/mypage"
