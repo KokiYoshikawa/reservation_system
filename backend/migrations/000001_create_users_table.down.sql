@@ -10,6 +10,18 @@ WHERE id IN (1, 2, 3, 4);
 DELETE FROM users
 WHERE email IN ('admin@example.com', 'user@example.com', 'guest@example.com');
 
+DROP INDEX IF EXISTS idx_logs_created_at;
+DROP INDEX IF EXISTS idx_logs_reservation;
+DROP INDEX IF EXISTS idx_logs_user;
+
+ALTER TABLE IF EXISTS operation_logs
+    DROP CONSTRAINT IF EXISTS fk_operation_logs_reservation;
+
+ALTER TABLE IF EXISTS operation_logs
+    DROP CONSTRAINT IF EXISTS fk_operation_logs_user;
+
+DROP TABLE IF EXISTS operation_logs;
+
 DROP INDEX IF EXISTS idx_reservations_slot_status;
 DROP INDEX IF EXISTS idx_reservations_reserved_at;
 DROP INDEX IF EXISTS idx_reservations_status;

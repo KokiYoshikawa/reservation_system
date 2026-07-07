@@ -35,6 +35,26 @@ export type ReservationSlotsResponse = {
   }
 }
 
+export type CreateReservationApiRequest = {
+  serviceId: number
+  slotId: number
+  note: string
+}
+
+export type CreateReservationResponse = {
+  data: {
+    reservationId: number
+    status: string
+    service: {
+      id: number
+      name: string
+    }
+    startTime: string
+    endTime: string
+    reservedAt: string
+  }
+}
+
 export type AuthUser = {
   email: string
   id?: number
@@ -120,6 +140,11 @@ export async function fetchReservationSlots(date: string, serviceId: number) {
       serviceId,
     },
   })
+  return response.data
+}
+
+export async function createReservationRequest(payload: CreateReservationApiRequest) {
+  const response = await apiClient.post<CreateReservationResponse>('/reservations', payload)
   return response.data
 }
 

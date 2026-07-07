@@ -37,7 +37,9 @@ func main() {
 	serviceHandler := handler.NewServiceHandler(serviceService)
 	reservationSlotService := service.NewReservationSlotService(repo)
 	reservationSlotHandler := handler.NewReservationSlotHandler(reservationSlotService)
-	router, err := internalrouter.New(h, authHandler, authService, userHandler, serviceHandler, reservationSlotHandler)
+	reservationService := service.NewReservationService(repo)
+	reservationHandler := handler.NewReservationHandler(reservationService)
+	router, err := internalrouter.New(h, authHandler, authService, userHandler, serviceHandler, reservationSlotHandler, reservationHandler)
 	if err != nil {
 		log.Fatalf("failed to configure trusted proxies: %v", err)
 	}

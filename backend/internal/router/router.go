@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(h *handler.Handler, authHandler *handler.AuthHandler, authService service.AuthService, userHandler *handler.UserHandler, serviceHandler *handler.ServiceHandler, reservationSlotHandler *handler.ReservationSlotHandler) (*gin.Engine, error) {
+func New(h *handler.Handler, authHandler *handler.AuthHandler, authService service.AuthService, userHandler *handler.UserHandler, serviceHandler *handler.ServiceHandler, reservationSlotHandler *handler.ReservationSlotHandler, reservationHandler *handler.ReservationHandler) (*gin.Engine, error) {
 	router := gin.Default()
 	if err := router.SetTrustedProxies(nil); err != nil {
 		return nil, err
@@ -27,6 +27,10 @@ func New(h *handler.Handler, authHandler *handler.AuthHandler, authService servi
 	auth.POST("/login", authHandler.Login)
 	authProtected.POST("/logout", authHandler.Logout)
 	authProtected.GET("/me", authHandler.Me)
+
+	protected := api.Group("")
+	protected.Use(middleware.NewAuthMiddleware(authService))
+	protected.POST("/reservations", reservationHandler.CreateReservation)
 
 	return router, nil
 }

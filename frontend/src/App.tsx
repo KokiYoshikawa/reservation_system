@@ -7,6 +7,8 @@ import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { MyPage } from './pages/MyPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { ReservationCompletePage } from './pages/ReservationCompletePage'
+import { ReservationConfirmPage } from './pages/ReservationConfirmPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ReservationSlotSearchPage } from './pages/ReservationSlotSearchPage'
 import { ReservationsPage } from './pages/ReservationsPage'
@@ -91,6 +93,22 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reservation-slots" element={<ReservationSlotSearchPage />} />
           <Route path="/services" element={<ServiceListPage />} />
+          <Route
+            path="/reservation-confirm"
+            element={
+              <ProtectedRoute>
+                <ReservationConfirmPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservation-complete"
+            element={
+              <ProtectedRoute>
+                <ReservationCompletePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/mypage"
             element={

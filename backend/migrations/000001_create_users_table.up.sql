@@ -61,6 +61,23 @@ CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations (status);
 CREATE INDEX IF NOT EXISTS idx_reservations_reserved_at ON reservations (reserved_at);
 CREATE INDEX IF NOT EXISTS idx_reservations_slot_status ON reservations (slot_id, status);
 
+CREATE TABLE IF NOT EXISTS operation_logs (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    reservation_id BIGINT,
+    action VARCHAR(50) NOT NULL,
+    detail TEXT,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_operation_logs_user
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_operation_logs_reservation
+        FOREIGN KEY (reservation_id) REFERENCES reservations (id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_logs_user ON operation_logs (user_id);
+CREATE INDEX IF NOT EXISTS idx_logs_reservation ON operation_logs (reservation_id);
+CREATE INDEX IF NOT EXISTS idx_logs_created_at ON operation_logs (created_at);
+
 INSERT INTO users (
     id,
     name,
@@ -101,12 +118,17 @@ INSERT INTO reservation_slots (
     updated_at
 )
 VALUES
-    (1, '2026-07-06 10:00:00', '2026-07-06 11:00:00', 1, NOW(), NOW()),
-    (2, '2026-07-06 11:30:00', '2026-07-06 12:30:00', 2, NOW(), NOW()),
-    (3, '2026-07-06 14:00:00', '2026-07-06 15:00:00', 1, NOW(), NOW()),
-    (4, '2026-07-07 10:00:00', '2026-07-07 11:00:00', 1, NOW(), NOW()),
-    (5, '2026-07-07 13:00:00', '2026-07-07 14:00:00', 2, NOW(), NOW())
-ON CONFLICT ON CONSTRAINT uk_slots_time DO NOTHING;
+    (1, date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '10 hours', date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '11 hours', 1, NOW(), NOW()),
+    (2, date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '11 hours 30 minutes', date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '12 hours 30 minutes', 2, NOW(), NOW()),
+    (3, date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '14 hours', date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '15 hours', 1, NOW(), NOW()),
+    (4, date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '10 hours', date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '11 hours', 1, NOW(), NOW()),
+    (5, date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '13 hours', date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '14 hours', 2, NOW(), NOW())
+ON CONFLICT (id) DO UPDATE
+SET
+    start_time = EXCLUDED.start_time,
+    end_time = EXCLUDED.end_time,
+    capacity = EXCLUDED.capacity,
+    updated_at = NOW();
 
 INSERT INTO reservations (
     id,
@@ -121,12 +143,22 @@ INSERT INTO reservations (
     updated_at
 )
 VALUES
-    (1, 2, 1, 1, 'reserved', '初回予約', '2026-07-05 18:00:00', NULL, NOW(), NOW()),
-    (2, 3, 2, 2, 'reserved', 'カラー希望', '2026-07-05 19:00:00', NULL, NOW(), NOW()),
-    (3, 2, 3, 5, 'cancelled', '都合によりキャンセル', '2026-07-05 20:00:00', '2026-07-05 21:00:00', NOW(), NOW())
-ON CONFLICT (id) DO NOTHING;
+    (1, 2, 1, 1, 'reserved', '初回予約', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '18 hours', NULL, NOW(), NOW()),
+    (2, 3, 2, 2, 'reserved', 'カラー希望', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '19 hours', NULL, NOW(), NOW()),
+    (3, 2, 3, 5, 'cancelled', '都合によりキャンセル', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '20 hours', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '21 hours', NOW(), NOW())
+ON CONFLICT (id) DO UPDATE
+SET
+    user_id = EXCLUDED.user_id,
+    service_id = EXCLUDED.service_id,
+    slot_id = EXCLUDED.slot_id,
+    status = EXCLUDED.status,
+    note = EXCLUDED.note,
+    reserved_at = EXCLUDED.reserved_at,
+    cancelled_at = EXCLUDED.cancelled_at,
+    updated_at = NOW();
 
 SELECT setval('users_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM users), 1));
 SELECT setval('services_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM services), 1));
 SELECT setval('reservation_slots_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM reservation_slots), 1));
 SELECT setval('reservations_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM reservations), 1));
+SELECT setval('operation_logs_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM operation_logs), 1));
