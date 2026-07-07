@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 )
@@ -40,6 +41,15 @@ func (r *Repository) CheckHealth(ctx context.Context) error {
 
 func (r *Repository) CheckRedisHealth(ctx context.Context) error {
 	return r.redis.Ping(ctx).Err()
+}
+
+func (r *Repository) BeginTx(ctx context.Context) (pgx.Tx, error) {
+	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("begin tx: %w", err)
+	}
+
+	return tx, nil
 }
 
 func (r *Repository) CreateSession(ctx context.Context, email string) (string, error) {

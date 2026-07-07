@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { LoadingIndicator } from '../components/LoadingIndicator'
 import { useAuth } from '../context/AuthContext'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { isAuthenticated, login, user } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const redirectTo = (location.state as { from?: string | { pathname: string; search?: string; hash?: string; state?: unknown } } | null)?.from ?? '/mypage'
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -19,7 +21,7 @@ export function LoginPage() {
 
     try {
       await login(email, password)
-      navigate('/mypage')
+      navigate(redirectTo, { replace: true })
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'ログインに失敗しました。')
     } finally {

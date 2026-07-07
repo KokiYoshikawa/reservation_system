@@ -682,3 +682,95 @@
   box-shadow: none;
   transform: none;
 }
+
+.reservation-summary-card,
+.confirmation-card,
+.completion-card {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid #d8dfec;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.94)),
+    radial-gradient(circle at top right, rgba(47, 111, 228, 0.09), transparent 30%);
+  box-shadow: 0 14px 30px rgba(34, 65, 128, 0.06);
+}
+
+.reservation-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reservation-summary-grid div {
+  padding-top: 14px;
+  border-top: 1px solid rgba(111, 127, 157, 0.18);
+}
+
+.reservation-summary-grid dt {
+  color: #6f7f9d;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.reservation-summary-grid dd {
+  margin: 6px 0 0;
+  color: #1d2b53;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.confirmation-form {
+  margin-top: 28px;
+}
+
+.note-field {
+  display: grid;
+  gap: 8px;
+}
+
+.note-field span {
+  color: #6f7f9d;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.note-field textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  border: 1px solid #d8dfec;
+  border-radius: 18px;
+  background: #fff;
+  color: #1d2b53;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-family: var(--sans);
+  resize: vertical;
+}
+
+.confirm-submit-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.confirm-submit-button:disabled {
+  cursor: wait;
+  opacity: 0.82;
+}
+
+.completion-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+  }
+}
