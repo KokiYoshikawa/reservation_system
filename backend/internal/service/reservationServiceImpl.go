@@ -21,6 +21,71 @@ func NewReservationService(repo *repository.Repository) ReservationService {
 	return &reservationService{repo: repo}
 }
 
+func (s *reservationService) GetReservationsByUser(ctx context.Context, userID int64) ([]ReservationResult, error) {
+	reservations, err := s.repo.FindByUserID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("reservation service find by user id: %w", err)
+	}
+
+	results := make([]ReservationResult, 0, len(reservations))
+	for i := range reservations {
+		result, err := s.toReservationResult(ctx, &reservations[i])
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, *result)
+	}
+
+	return results, nil
+}
+
+func (s *reservationService) GetReservationDetail(ctx context.Context, userID, reservationID int64) (*ReservationResult, error) {
+	reservation, err := s.repo.FindByID(ctx, reservationID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrReservationNotFound
+		}
+
+		return nil, fmt.Errorf("reservation service find by id: %w", err)
+	}
+
+	// Return the same result for a missing reservation and another user's
+	// reservation so callers cannot discover reservation IDs they do not own.
+	if reservation.UserID != userID {
+		return nil, ErrReservationNotFound
+	}
+
+	return s.toReservationResult(ctx, reservation)
+}
+
+func (s *reservationService) toReservationResult(ctx context.Context, reservation *domain.Reservation) (*ReservationResult, error) {
+	serviceItem, err := s.repo.FindServiceByID(ctx, reservation.ServiceID)
+	if err != nil {
+		return nil, fmt.Errorf("reservation service find related service: %w", err)
+	}
+
+	slot, err := s.repo.FindReservationSlotByID(ctx, reservation.SlotID)
+	if err != nil {
+		return nil, fmt.Errorf("reservation service find related slot: %w", err)
+	}
+
+	return &ReservationResult{
+		ReservationID: reservation.ID,
+		Status:        reservation.Status,
+		ServiceID:     serviceItem.ID,
+		ServiceName:   serviceItem.Name,
+		SlotID:        slot.ID,
+		StartTime:     slot.StartTime,
+		EndTime:       slot.EndTime,
+		Note:          reservation.Note,
+		ReservedAt:    reservation.ReservedAt,
+		CancelledAt:   reservation.CancelledAt,
+		CreatedAt:     reservation.CreatedAt,
+		UpdatedAt:     reservation.UpdatedAt,
+	}, nil
+}
+
 func (s *reservationService) CreateReservation(ctx context.Context, userID int64, req dto.CreateReservationRequest) (*ReservationResult, error) {
 	serviceItem, err := s.repo.FindServiceByID(ctx, req.ServiceID)
 	if err != nil {

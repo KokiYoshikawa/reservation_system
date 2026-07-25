@@ -8,6 +8,34 @@ import (
 	"reservation-system/backend/internal/domain"
 )
 
+func (r *Repository) FindReservationSlotByID(ctx context.Context, slotID int64) (*domain.ReservationSlot, error) {
+	const query = `
+		SELECT
+			id,
+			start_time,
+			end_time,
+			capacity,
+			created_at,
+			updated_at
+		FROM reservation_slots
+		WHERE id = $1
+	`
+
+	slot := &domain.ReservationSlot{}
+	if err := r.db.QueryRow(ctx, query, slotID).Scan(
+		&slot.ID,
+		&slot.StartTime,
+		&slot.EndTime,
+		&slot.Capacity,
+		&slot.CreatedAt,
+		&slot.UpdatedAt,
+	); err != nil {
+		return nil, fmt.Errorf("find reservation slot by id: %w", err)
+	}
+
+	return slot, nil
+}
+
 func (r *Repository) FindReservationSlotsByDate(ctx context.Context, targetDate time.Time) ([]domain.ReservationSlot, error) {
 	startOfDay := time.Date(
 		targetDate.Year(),

@@ -9,9 +9,10 @@ import { MyPage } from './pages/MyPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ReservationCompletePage } from './pages/ReservationCompletePage'
 import { ReservationConfirmPage } from './pages/ReservationConfirmPage'
+import { ReservationDetailPage } from './pages/ReservationDetailPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ReservationSlotSearchPage } from './pages/ReservationSlotSearchPage'
-import { ReservationsPage } from './pages/ReservationsPage'
+import { MyReservationListPage } from './pages/MyReservationListPage'
 import { ServiceListPage } from './pages/ServiceListPage'
 
 function App() {
@@ -122,7 +123,15 @@ function App() {
             path="/reservations"
             element={
               <ProtectedRoute>
-                <ReservationsPage />
+                <MyReservationListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservations/:reservationId"
+            element={
+              <ProtectedRoute>
+                <ReservationDetailPage />
               </ProtectedRoute>
             }
           />

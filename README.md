@@ -21,7 +21,13 @@ React(TypeScript)によるSPAで構成しています。
 
 ## デモ
 
-TODO
+一般ユーザーでログインすると、予約済み・キャンセル済みの初期予約データを確認できます。
+
+| 用途 | メールアドレス | パスワード |
+|---|---|---|
+| マイ予約一覧・詳細 | `user@example.com` | `userpass` |
+| 所有者チェック確認 | `guest@example.com` | `guestpass` |
+| 管理者 | `admin@example.com` | `adminpass` |
 
 ## 主な機能
 

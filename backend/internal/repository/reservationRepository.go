@@ -9,6 +9,94 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func (r *Repository) FindByUserID(ctx context.Context, userID int64) ([]domain.Reservation, error) {
+	const query = `
+		SELECT
+			id,
+			user_id,
+			service_id,
+			slot_id,
+			status,
+			note,
+			reserved_at,
+			cancelled_at,
+			created_at,
+			updated_at
+		FROM reservations
+		WHERE user_id = $1
+		ORDER BY reserved_at DESC, id DESC
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("find reservations by user id: %w", err)
+	}
+	defer rows.Close()
+
+	reservations := make([]domain.Reservation, 0)
+	for rows.Next() {
+		var reservation domain.Reservation
+		if err := rows.Scan(
+			&reservation.ID,
+			&reservation.UserID,
+			&reservation.ServiceID,
+			&reservation.SlotID,
+			&reservation.Status,
+			&reservation.Note,
+			&reservation.ReservedAt,
+			&reservation.CancelledAt,
+			&reservation.CreatedAt,
+			&reservation.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("scan reservation by user id: %w", err)
+		}
+
+		reservations = append(reservations, reservation)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate reservations by user id: %w", err)
+	}
+
+	return reservations, nil
+}
+
+func (r *Repository) FindByID(ctx context.Context, reservationID int64) (*domain.Reservation, error) {
+	const query = `
+		SELECT
+			id,
+			user_id,
+			service_id,
+			slot_id,
+			status,
+			note,
+			reserved_at,
+			cancelled_at,
+			created_at,
+			updated_at
+		FROM reservations
+		WHERE id = $1
+	`
+
+	reservation := &domain.Reservation{}
+	if err := r.db.QueryRow(ctx, query, reservationID).Scan(
+		&reservation.ID,
+		&reservation.UserID,
+		&reservation.ServiceID,
+		&reservation.SlotID,
+		&reservation.Status,
+		&reservation.Note,
+		&reservation.ReservedAt,
+		&reservation.CancelledAt,
+		&reservation.CreatedAt,
+		&reservation.UpdatedAt,
+	); err != nil {
+		return nil, fmt.Errorf("find reservation by id: %w", err)
+	}
+
+	return reservation, nil
+}
+
 func (r *Repository) CountReservedBySlotIDs(ctx context.Context, slotIDs []int64) (map[int64]int, error) {
 	if len(slotIDs) == 0 {
 		return map[int64]int{}, nil

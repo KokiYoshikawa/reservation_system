@@ -31,6 +31,8 @@ func New(h *handler.Handler, authHandler *handler.AuthHandler, authService servi
 	protected := api.Group("")
 	protected.Use(middleware.NewAuthMiddleware(authService))
 	protected.POST("/reservations", reservationHandler.CreateReservation)
+	protected.GET("/reservations", reservationHandler.GetReservations)
+	protected.GET("/reservations/:reservationId", reservationHandler.GetReservation)
 
 	return router, nil
 }

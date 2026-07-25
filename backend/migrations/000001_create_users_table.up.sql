@@ -122,7 +122,11 @@ VALUES
     (2, date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '11 hours 30 minutes', date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '12 hours 30 minutes', 2, NOW(), NOW()),
     (3, date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '14 hours', date_trunc('day', NOW() + INTERVAL '6 months') + INTERVAL '15 hours', 1, NOW(), NOW()),
     (4, date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '10 hours', date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '11 hours', 1, NOW(), NOW()),
-    (5, date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '13 hours', date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '14 hours', 2, NOW(), NOW())
+    (5, date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '13 hours', date_trunc('day', NOW() + INTERVAL '6 months 1 day') + INTERVAL '14 hours', 2, NOW(), NOW()),
+    (1001, date_trunc('day', NOW() + INTERVAL '6 months 2 days') + INTERVAL '10 hours', date_trunc('day', NOW() + INTERVAL '6 months 2 days') + INTERVAL '11 hours', 1, NOW(), NOW()),
+    (1002, date_trunc('day', NOW() + INTERVAL '6 months 3 days') + INTERVAL '13 hours', date_trunc('day', NOW() + INTERVAL '6 months 3 days') + INTERVAL '14 hours', 1, NOW(), NOW()),
+    (1003, date_trunc('day', NOW() + INTERVAL '6 months 4 days') + INTERVAL '11 hours', date_trunc('day', NOW() + INTERVAL '6 months 4 days') + INTERVAL '12 hours', 1, NOW(), NOW()),
+    (1004, date_trunc('day', NOW() + INTERVAL '6 months 7 days') + INTERVAL '15 hours', date_trunc('day', NOW() + INTERVAL '6 months 7 days') + INTERVAL '16 hours', 1, NOW(), NOW())
 ON CONFLICT (id) DO UPDATE
 SET
     start_time = EXCLUDED.start_time,
@@ -143,9 +147,13 @@ INSERT INTO reservations (
     updated_at
 )
 VALUES
-    (1, 2, 1, 1, 'reserved', '初回予約', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '18 hours', NULL, NOW(), NOW()),
-    (2, 3, 2, 2, 'reserved', 'カラー希望', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '19 hours', NULL, NOW(), NOW()),
-    (3, 2, 3, 5, 'cancelled', '都合によりキャンセル', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '20 hours', date_trunc('day', NOW() + INTERVAL '6 months') - INTERVAL '1 day' + INTERVAL '21 hours', NOW(), NOW())
+    (1, 2, 1, 1, 'reserved', '初回予約です。よろしくお願いします。', NOW() - INTERVAL '3 days', NULL, NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
+    (2, 3, 2, 2, 'reserved', 'カラーは落ち着いた色を希望します。', NOW() - INTERVAL '2 days', NULL, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
+    (3, 2, 3, 5, 'cancelled', '都合によりキャンセルしました。', NOW() - INTERVAL '10 days', NOW() - INTERVAL '8 days', NOW() - INTERVAL '10 days', NOW() - INTERVAL '8 days'),
+    (1001, 2, 2, 1001, 'reserved', '敏感肌なので、施術前に相談したいです。', NOW() - INTERVAL '1 day', NULL, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day'),
+    (1002, 2, 1, 1002, 'cancelled', NULL, NOW() - INTERVAL '14 days', NOW() - INTERVAL '12 days', NOW() - INTERVAL '14 days', NOW() - INTERVAL '12 days'),
+    (1003, 3, 3, 1003, 'reserved', '頭皮の乾燥が気になります。', NOW() - INTERVAL '12 hours', NULL, NOW() - INTERVAL '12 hours', NOW() - INTERVAL '12 hours'),
+    (1004, 2, 1, 1004, 'reserved', '前回と同じスタイルを希望します。', NOW() - INTERVAL '2 hours', NULL, NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 hours')
 ON CONFLICT (id) DO UPDATE
 SET
     user_id = EXCLUDED.user_id,
@@ -155,6 +163,7 @@ SET
     note = EXCLUDED.note,
     reserved_at = EXCLUDED.reserved_at,
     cancelled_at = EXCLUDED.cancelled_at,
+    created_at = EXCLUDED.created_at,
     updated_at = NOW();
 
 SELECT setval('users_id_seq', GREATEST((SELECT COALESCE(MAX(id), 1) FROM users), 1));

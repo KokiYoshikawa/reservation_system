@@ -1,8 +1,8 @@
 DELETE FROM reservations
-WHERE id IN (1, 2, 3);
+WHERE id IN (1, 2, 3, 1001, 1002, 1003, 1004);
 
 DELETE FROM reservation_slots
-WHERE id IN (1, 2, 3, 4, 5);
+WHERE id IN (1, 2, 3, 4, 5, 1001, 1002, 1003, 1004);
 
 DELETE FROM services
 WHERE id IN (1, 2, 3, 4);

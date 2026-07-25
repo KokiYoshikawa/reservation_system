@@ -55,6 +55,33 @@ export type CreateReservationResponse = {
   }
 }
 
+export type ReservationItem = {
+  reservationId: number
+  status: string
+  service: {
+    id: number
+    name: string
+  }
+  slotId: number
+  startTime: string
+  endTime: string
+  note: string | null
+  reservedAt: string
+  cancelledAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type ReservationsResponse = {
+  data: {
+    reservations: ReservationItem[]
+  }
+}
+
+export type ReservationDetailResponse = {
+  data: ReservationItem
+}
+
 export type AuthUser = {
   email: string
   id?: number
@@ -145,6 +172,18 @@ export async function fetchReservationSlots(date: string, serviceId: number) {
 
 export async function createReservationRequest(payload: CreateReservationApiRequest) {
   const response = await apiClient.post<CreateReservationResponse>('/reservations', payload)
+  return response.data
+}
+
+export async function fetchReservations() {
+  const response = await apiClient.get<ReservationsResponse>('/reservations')
+  return response.data
+}
+
+export async function fetchReservationDetail(reservationId: number) {
+  const response = await apiClient.get<ReservationDetailResponse>(
+    `/reservations/${reservationId}`,
+  )
   return response.data
 }
 
